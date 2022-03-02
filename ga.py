@@ -169,22 +169,46 @@ def crossover_func(parents, offspring_size, ga_instance):
     offspring = []
     gene_length = len(prod_manager.work_plan)
     idx = 0
+
+    #Select part of chromosome to crossover: 0=Machine, 1=Schedule
+    crossover_part = random.randint(0,1)
     while len(offspring) != offspring_size[0]:
 
         #Pick the parents
         parent1 = parents[idx % parents.shape[0], :].copy()
         parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
 
-        random_split_point = np.random.choice(range(gene_length))
-
         #Cross the Machine selection part (First half of chromosome)
-        parent1[random_split_point:gene_length] = parent2[random_split_point:gene_length]
+        if crossover_part == 0:
+            random_split_point = np.random.choice(range(gene_length))           
+            parent1[random_split_point:gene_length] = parent2[random_split_point:gene_length]
 
-        #Cross Operation schedule selection part (Cannot be simply cut and swapped, must match the work operations available)
-        random_split_point = np.random.choice(range(gene_length))
-        #One part can be copied - then the rest must match schedule constraint
-        #parent1[gene_length:gene_length+random_split_point] = parent2[gene_length:gene_length+random_split_point]
+        #Cross Operation schedule selection part (Cannot be simply cut and swapped, must match the work operations available)        
+        #PPX crossover
+        else:
+            p1_schedule = list(parent1[gene_length:])
+            p2_schedule = list(parent2[gene_length:])
+            parents_schedule = [p1_schedule,p2_schedule]
+            
+            #Vector of 0-1:s to select which parent to get next gene from
+            random_selection_vector = np.random.randint(2,size=gene_length)
 
+            #The new schedule
+            schedule = np.zeros(gene_length,dtype=np.int32)
+
+            #Iterate all genes
+            for idx,i in enumerate(random_selection_vector):
+                
+                #Select the gene next in line from selected parent
+                #Add gene to schedule
+                schedule[idx] = parents_schedule[i][0]
+
+                #Remove the occurence from both parents
+                parents_schedule[i].remove(schedule[idx])
+                parents_schedule[int(not i)].remove(schedule[idx])
+        
+            #Assemble the full chromosome(machine+schedule)
+            parent1[gene_length:] = schedule
         offspring.append(parent1)
 
         idx += 1

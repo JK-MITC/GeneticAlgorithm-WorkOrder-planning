@@ -4,7 +4,7 @@ import random
 
 def plotSchedule(makespan,schedule):
 
-    print(schedule)
+    #print(schedule)
 
     bar_height = 3.0
     bar_margin = 2.0
