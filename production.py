@@ -19,7 +19,7 @@ class ProductionManager:
             for ind,op in enumerate(part_operations):
                 
                 dependencies = None if ind == 0 else part_operations[:ind]
-                work_point = {'order_id': wo['id'],'part_name':wo['order'].partname,'operation': op, 'dependencies':dependencies,'scheduled':False, 'starttime':0,'endtime':0}
+                work_point = {'order_id': wo['id'],'order_size':wo['order'].order_size,'part_name':wo['order'].partname,'operation': op, 'dependencies':dependencies,'scheduled':False, 'starttime':0,'endtime':0}
                 
                 self.work_plan.append(work_point)
         #print(self.work_plan)
@@ -28,11 +28,12 @@ class ProductionManager:
 
 class Machine:
     
-    def __init__(self, name, parts):
+    def __init__(self, name, parts, setuptime=600):
         self.name = name
         self.parts = parts
         self.next_time_slot = 0
         self.planned_work = []
+        self.setup_time=setuptime
         
     def addWork(self,time):
         self.time_slot += time

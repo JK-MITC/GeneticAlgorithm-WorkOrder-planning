@@ -4,20 +4,25 @@ import random
 import numpy as np
 import SchedulePlot as sp
 
-
+#Part with it's operations
 parts = [
     Part('Part1',['Op1','Op2']),
     Part('Part2',['Op1','Op2']),
-    Part('Part3',['Op1'])
+    Part('Part3',['Op1']),
+    Part('Part4',['Op1','Op2','Op3','Op4','Op5']),
+    Part('Part5',['Op1','Op2','Op3'])
     ]
 
+#Machines that can do the work with operation time in minutes
 machines = [
     Machine('Machine0', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':100},{'opname':'Op2','optime':200}]},
                          {'partname': 'Part2','operations':[{'opname':'Op1','optime':200}]},
-                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':100}]}]),
+                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':100}]},
+                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':100},{'opname':'Op2','optime':150},{'opname':'Op3','optime':200},{'opname':'Op5','optime':150}]}]),
     
     Machine('Machine1', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':150},{'opname':'Op2','optime':150}]},
-                         {'partname': 'Part2','operations':[{'opname':'Op2','optime':200}]}]),
+                         {'partname': 'Part2','operations':[{'opname':'Op2','optime':200}]},
+                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':50},{'opname':'Op3','optime':250},{'opname':'Op4','optime':250}]}]),
     
     Machine('Machine2', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':200}]},
                          {'partname': 'Part2','operations':[{'opname':'Op1','optime':110},{'opname':'Op2','optime':150}]},
@@ -25,11 +30,20 @@ machines = [
 
     Machine('Machine4', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':250}]},
                          {'partname': 'Part2','operations':[{'opname':'Op1','optime':50},{'opname':'Op2','optime':250}]},
-                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':400}]}])
+                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':400}]},
+                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':100},{'opname':'Op2','optime':120},{'opname':'Op3','optime':80}]}]),
+
+    Machine('Machine5', [{'partname': 'Part2','operations':[{'opname':'Op1','optime':250},{'opname':'Op2','optime':150}]},
+                         {'partname': 'Part4','operations':[{'opname':'Op4','optime':500}]}])
     ]
 
-
-work_orders = [WorkOrder('Part1',500),WorkOrder('Part2',300),WorkOrder('Part3',100),WorkOrder('Part3',100),WorkOrder('Part1',100),WorkOrder('Part2',100)]
+#Work orders with Part and amount of parts to produce
+work_orders = [WorkOrder('Part4',500),WorkOrder('Part2',300),
+                WorkOrder('Part3',100),WorkOrder('Part3',100),
+                WorkOrder('Part1',100),WorkOrder('Part2',100),
+                WorkOrder('Part1',200),WorkOrder('Part1',100),
+                WorkOrder('Part4',100),WorkOrder('Part3',100),
+                WorkOrder('Part5',1000),WorkOrder('Part2',150)]
 
 prod_manager = ProductionManager(parts,machines)
 
@@ -59,7 +73,6 @@ def scheduleFromSolution(solution):
                
         work_points = [(idx,x) for idx,x in enumerate(workplan) if x['order_id'] == job and x['scheduled'] == False]
         
-        
         current_work_point = work_points[0]
         
         selected_machine_for_op = prod_manager.machines[machine_selection[current_work_point[0]]]
@@ -72,6 +85,7 @@ def scheduleFromSolution(solution):
                     if operation['opname'] == current_work_point[1]['operation']:
                         
                         op_work_time = operation['optime']
+                        
                         dependency_offset = 0
                         
                         #Check scheduled dependencies
@@ -93,18 +107,23 @@ def scheduleFromSolution(solution):
                         if scheduled_machine_ops == 0:
                             
                             current_work_point[1]['starttime'] = 0 + dependency_offset
-                            current_work_point[1]['endtime'] = op_work_time + dependency_offset
-                        #Jobs previously scheduled, get time om last job    
+                            current_work_point[1]['endtime'] = (op_work_time * current_work_point[1]['order_size']) + dependency_offset
+                        #Jobs previously scheduled, get time from last job    
                         else:
                             last_op = machine_schedule[selected_machine_for_op.name][-1]
-                            
+
+                            #Setup time needed?
+                            if last_op['part_name'] != current_work_point[1]['part_name'] or last_op['operation'] != current_work_point[1]['operation']:
+                                setup_operation = {'order_id':'setup','part_name':'setup','operation':'setup','starttime':last_op['endtime'],'endtime':last_op['endtime']+selected_machine_for_op.setup_time}
+                                machine_schedule[selected_machine_for_op.name].append(setup_operation)
+                                last_op = setup_operation
+
                             if last_op['endtime'] >= dependency_offset:
                                 current_work_point[1]['starttime'] = last_op['endtime']
-                                current_work_point[1]['endtime'] = last_op['endtime'] + op_work_time
+                                current_work_point[1]['endtime'] = last_op['endtime'] + (op_work_time * current_work_point[1]['order_size'])
                             else:
                                 current_work_point[1]['starttime'] = dependency_offset
-                                #current_work_point[1]['endtime'] = last_op['endtime'] + op_work_time
-                                current_work_point[1]['endtime'] = dependency_offset + op_work_time
+                                current_work_point[1]['endtime'] = dependency_offset + (op_work_time * current_work_point[1]['order_size'])
                         
                         makespan = max(makespan,current_work_point[1]['endtime'])
                         
@@ -159,7 +178,9 @@ def create_initial_population(size):
     
 def fitness_function(solution, index):
     
-    return 1.0/scheduleFromSolution(solution)[0]
+    makespan = scheduleFromSolution(solution)[0]/10000
+    #return makespan#1.0/makespan
+    return 1.0/makespan
 
 
 
@@ -171,7 +192,7 @@ def crossover_func(parents, offspring_size, ga_instance):
     idx = 0
 
     #Select part of chromosome to crossover: 0=Machine, 1=Schedule
-    crossover_part = random.randint(0,1)
+    global crossover_part
     while len(offspring) != offspring_size[0]:
 
         #Pick the parents
@@ -248,22 +269,34 @@ def mutation_func(offspring, ga_instance):
     return offspring
 
 def on_generation(ga_instance):
-    bg = ga_instance.best_solution()
-    print("Generation: ", ga_instance.generations_completed," Best: ",bg[1], end='\r')    
-    
-population = create_initial_population(100)
+    solution,best_fitness,best_index = ga_instance.best_solution()
+    global previous_best_solution,crossover_swap_thresh,crossover_part
 
+    if best_fitness > previous_best_solution[0]:
+        previous_best_solution = best_fitness,ga_instance.generations_completed
+    gens_since_best = ga_instance.generations_completed - previous_best_solution[1]
+
+    if gens_since_best != 0 and gens_since_best % crossover_swap_thresh == 0:
+        crossover_part = int(not crossover_part)
+    print("| Generation: %d | Best fitness: %0.4f | Generations since best: %d |" % (ga_instance.generations_completed, best_fitness, gens_since_best), end='\r')    
+
+#Used to know when to swap the part that is crossed over
+#If no change after 'crossover_swap_thres' then move to next part to crossover(Machine vs Schedule)
+previous_best_solution = (-1,0)
+crossover_swap_thresh = 100
+crossover_part = 0
+
+population_size = 100
 num_generations = 1000
 num_parents_mating = 10
 sol_per_pop = 2
 gene_type = (int)
 num_genes = len(prod_manager.work_plan)*2
 parent_selection_type = 'sss'
-keep_parents = 1
-#crossover_type = "single_point"
-#mutation_type = "random"
-mutation_percent_genes = 20
-
+keep_parents = 10
+mutation_percent_genes = 10
+stop_criterias = ['saturate_5000']
+population = create_initial_population(population_size)
    
 ga_instance = ga.GA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -277,7 +310,8 @@ ga_instance = ga.GA(num_generations=num_generations,
                        crossover_type=crossover_func,
                        mutation_type=mutation_func,
                        mutation_percent_genes=mutation_percent_genes,
-                       on_generation=on_generation)
+                       on_generation=on_generation,
+                       stop_criteria=stop_criterias)
 
 ga_instance.run()
 ga_instance.plot_fitness()

@@ -10,16 +10,19 @@ def plotSchedule(makespan,schedule):
     bar_margin = 2.0
     # Declaring a figure "gnt"
     fig, gnt = plt.subplots()
-    gnt.set_title('Work operations schedule - Lead Time '+str(makespan))
+    
+    hours = makespan/60.0
+    title = "Work order - Lead Time %.1f hours" % hours
+    gnt.set_title(title)
     
     # Setting Y-axis limits
     gnt.set_ylim(0, ((bar_margin + bar_height)*len(schedule))+bar_margin)
 
     # Setting X-axis limits
-    gnt.set_xlim(0, makespan)
+    gnt.set_xlim(0, makespan/60.0)
 
     # Setting labels for x-axis and y-axis
-    gnt.set_xlabel('Time')
+    gnt.set_xlabel('Time (Hours)')
     gnt.set_ylabel('Machine')
     #ylm = ((bar_margin+bar_height)*len(schedule)+bar_margin)/(len(schedule)+1)
     ylm = gnt.get_ylim()[1]/(len(schedule)+1)
@@ -45,15 +48,22 @@ def plotSchedule(makespan,schedule):
             if item['order_id'] not in work_order_color.keys():
                 work_order_color[item['order_id']] = (random.uniform(0.0, 1.0),random.uniform(0.0, 1.0),random.uniform(0.0, 1.0),1.0)
             y_bar_pos = yticks[idx]-(bar_height/2.0)
-            gnt.broken_barh([(item['starttime'],item['endtime']-item['starttime'])],(y_bar_pos,bar_height),facecolors=(work_order_color[item['order_id']]),edgecolor='black', label='Order '+str(item['order_id']))
 
-            gnt.text(x=(item['starttime']+(item['endtime'] - item['starttime'])/2), 
-                    y=yticks[idx],
-                    s=item['part_name'] + "-" + item['operation'], 
-                    ha='center', 
-                    va='center',
-                    color='black',
-                   )
+            #In Hours
+            starttime = item['starttime']/60.0
+            endtime = item['endtime'] /60.0
+            duration = (item['endtime']-item['starttime'])/60.0
+            label = 'Machine setup' if item['order_id'] == 'setup' else 'Order '+str(item['order_id'])
+            #gnt.broken_barh([(item['starttime']/60.0,(item['endtime']-item['starttime'])/60.0)],(y_bar_pos,bar_height),facecolors=(work_order_color[item['order_id']]),edgecolor='black', label='Order '+str(item['order_id']))
+            gnt.broken_barh([(starttime,duration)],(y_bar_pos,bar_height),facecolors=(work_order_color[item['order_id']]),edgecolor='black', label=label)
+            if duration > 100:
+                gnt.text(x=(starttime+duration/2), 
+                        y=yticks[idx],
+                        s=item['part_name'] + "-" + item['operation'], 
+                        ha='center', 
+                        va='center',
+                        color='black',
+                    )
 
     fig.set_figwidth(gnt.get_figure().get_figwidth()+10)
     
