@@ -1,8 +1,10 @@
+from turtle import delay
 import pygad as ga
 from production import Part,Machine,WorkOrder, ProductionManager
 import random
 import numpy as np
 import SchedulePlot as sp
+
 
 #Part with it's operations
 parts = [
@@ -15,35 +17,55 @@ parts = [
 
 #Machines that can do the work with operation time in minutes
 machines = [
-    Machine('Machine0', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':100},{'opname':'Op2','optime':200}]},
-                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':200}]},
-                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':100}]},
-                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':100},{'opname':'Op2','optime':150},{'opname':'Op3','optime':200},{'opname':'Op5','optime':150}]}]),
+    Machine('Machine0', [
+                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
+                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
+                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10},{'opname':'Op3','optime':10}]}
+                        ]),
     
-    Machine('Machine1', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':150},{'opname':'Op2','optime':150}]},
-                         {'partname': 'Part2','operations':[{'opname':'Op2','optime':200}]},
-                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':50},{'opname':'Op3','optime':250},{'opname':'Op4','optime':250}]}]),
+    Machine('Machine1', [
+                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
+                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
+                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+                        #{'partname': 'Part4','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20},{'opname':'Op3','optime':10}]}
+                        ]),
     
-    Machine('Machine2', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':200}]},
-                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':110},{'opname':'Op2','optime':150}]},
-                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':500}]}]),
+    Machine('Machine2', [
+                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20}]},
+                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20}]},
+                        #{'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20},{'opname':'Op3','optime':10}]}
+                        ]),
 
-    Machine('Machine4', [{'partname': 'Part1','operations':[{'opname':'Op1','optime':250}]},
-                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':50},{'opname':'Op2','optime':250}]},
-                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':400}]},
-                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':100},{'opname':'Op2','optime':120},{'opname':'Op3','optime':80}]}]),
+    Machine('Machine3', [
+                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20}]},
+                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':30}]},
+                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':20}]},
+                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10},{'opname':'Op3','optime':10}]}
+                        ]),
 
-    Machine('Machine5', [{'partname': 'Part2','operations':[{'opname':'Op1','optime':250},{'opname':'Op2','optime':150}]},
-                         {'partname': 'Part4','operations':[{'opname':'Op4','optime':500}]}])
+    Machine('Machine4', [
+                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20}]},
+                        #{'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
+                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':15},{'opname':'Op3','optime':15}]}
+                        ]),
+                         
     ]
 
 #Work orders with Part and amount of parts to produce
-work_orders = [WorkOrder('Part4',500),WorkOrder('Part2',300),
-                WorkOrder('Part3',100),WorkOrder('Part3',100),
+work_orders = [WorkOrder('Part4',100),WorkOrder('Part2',150),
+                WorkOrder('Part3',10),WorkOrder('Part3',20),
                 WorkOrder('Part1',100),WorkOrder('Part2',100),
-                WorkOrder('Part1',200),WorkOrder('Part1',100),
-                WorkOrder('Part4',100),WorkOrder('Part3',100),
-                WorkOrder('Part5',1000),WorkOrder('Part2',150)]
+                WorkOrder('Part1',200),WorkOrder('Part5',50),
+                WorkOrder('Part4',10),WorkOrder('Part3',10),
+                WorkOrder('Part5',150),WorkOrder('Part2',250)]
 
 prod_manager = ProductionManager(parts,machines)
 
@@ -134,7 +156,7 @@ def scheduleFromSolution(solution):
     return (makespan,machine_schedule)
 
 def create_initial_population(size):
-    
+    print('Creating initial population of size %d...' % size)
     population = []
     
     #Size of population
@@ -179,7 +201,7 @@ def create_initial_population(size):
 def fitness_function(solution, index):
     
     makespan = scheduleFromSolution(solution)[0]/10000
-    #return makespan#1.0/makespan
+    #return -makespan
     return 1.0/makespan
 
 
@@ -201,9 +223,13 @@ def crossover_func(parents, offspring_size, ga_instance):
 
         #Cross the Machine selection part (First half of chromosome)
         if crossover_part == 0:
-            random_split_point = np.random.choice(range(gene_length))           
-            parent1[random_split_point:gene_length] = parent2[random_split_point:gene_length]
+            #random_split_point = np.random.choice(range(gene_length))         
+            #parent1[random_split_point:gene_length] = parent2[random_split_point:gene_length]
 
+            #pick amount of indices to cross
+            selected_amount = gene_length*0.3
+            picks = np.random.choice(range(gene_length),int(selected_amount))
+            parent1[picks] = parent2[picks]
         #Cross Operation schedule selection part (Cannot be simply cut and swapped, must match the work operations available)        
         #PPX crossover
         else:
@@ -274,34 +300,37 @@ def on_generation(ga_instance):
 
     if best_fitness > previous_best_solution[0]:
         previous_best_solution = best_fitness,ga_instance.generations_completed
+        makespan,schedule = scheduleFromSolution(solution=solution) 
+        sp.plotUpdatedSchedule(makespan=makespan,schedule=schedule)
     gens_since_best = ga_instance.generations_completed - previous_best_solution[1]
 
     if gens_since_best != 0 and gens_since_best % crossover_swap_thresh == 0:
         crossover_part = int(not crossover_part)
-    print("| Generation: %d | Best fitness: %0.4f | Generations since best: %d |" % (ga_instance.generations_completed, best_fitness, gens_since_best), end='\r')    
+    print("| Generation: %d | Best fitness: %0.4f | Generations since best: %d |" % (ga_instance.generations_completed, best_fitness, gens_since_best), end='\r')
 
+    
 #Used to know when to swap the part that is crossed over
 #If no change after 'crossover_swap_thres' then move to next part to crossover(Machine vs Schedule)
 previous_best_solution = (-1,0)
-crossover_swap_thresh = 100
+crossover_swap_thresh = 150
 crossover_part = 0
 
 population_size = 100
-num_generations = 1000
-num_parents_mating = 10
-sol_per_pop = 2
+num_generations = 10000
+num_parents_mating = 20
 gene_type = (int)
 num_genes = len(prod_manager.work_plan)*2
 parent_selection_type = 'sss'
-keep_parents = 10
-mutation_percent_genes = 10
-stop_criterias = ['saturate_5000']
+keep_parents = 5
+mutation_percent_genes = 20
+stop_criterias = ['saturate_500']
 population = create_initial_population(population_size)
-   
+
+sp.showPlot()
+
 ga_instance = ga.GA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
                        fitness_func=fitness_function,
-                       sol_per_pop=sol_per_pop,
                        gene_type=gene_type,
                        num_genes=num_genes,
                        initial_population=population,
@@ -314,8 +343,10 @@ ga_instance = ga.GA(num_generations=num_generations,
                        stop_criteria=stop_criterias)
 
 ga_instance.run()
-ga_instance.plot_fitness()
 
+ga_instance.plot_fitness(title='Fitness vs Generation')
+
+sp.keepPlot()
 makespan,machine_schedule = scheduleFromSolution(ga_instance.best_solution()[0])
 
-sp.plotSchedule(makespan,machine_schedule)
+#sp.plotSchedule(makespan,machine_schedule)

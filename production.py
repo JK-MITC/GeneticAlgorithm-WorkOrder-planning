@@ -3,8 +3,11 @@ class ProductionManager:
         
         
     def __init__(self, parts, machines):
-        self.parts = parts
-        self.machines = machines
+
+        self.parts = list(set(parts))
+        #self.parts = parts
+        self.machines = list(set(machines))
+        #self.machines = machines
     
     
     def createWorkPlan(self, work_order_list):
@@ -28,13 +31,25 @@ class ProductionManager:
 
 class Machine:
     
-    def __init__(self, name, parts, setuptime=600):
+    def __init__(self, name, parts, setuptime=60):
         self.name = name
         self.parts = parts
         self.next_time_slot = 0
         self.planned_work = []
         self.setup_time=setuptime
-        
+
+    def __hash__(self):
+        # necessary for instances to behave sanely in dicts and sets.
+        return hash(self.name)
+
+    def __eq__(self, other):
+
+        if not isinstance(other, Machine):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+       
+        return self.name == other.name
+
     def addWork(self,time):
         self.time_slot += time
     
@@ -54,7 +69,19 @@ class Part:
     def __init__(self, name, operations):
         self.name = name
         self.operations = operations
-    
+
+    def __hash__(self):
+        # necessary for instances to behave sanely in dicts and sets.
+        return hash(self.name)
+
+    def __eq__(self, other):
+
+        if not isinstance(other, Machine):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+
+        return self.name == other.name
+
 class WorkOrder:
     def __init__(self, part, size):
         self.partname = part
