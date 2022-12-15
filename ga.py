@@ -1,29 +1,33 @@
-from turtle import delay
+#from turtle import delay
+import sys
+import csv
 import pygad as ga
 from production import Part,Machine,WorkOrder, ProductionManager
 import random
 import numpy as np
 import SchedulePlot as sp
 
+#### EXAMPLE DATA FOR THE DATASTRUCTURE OF parts,machines&orders ###########
 
 #Part with it's operations
-parts = [
+parts_example = [
     Part('Part1',['Op1','Op2']),
     Part('Part2',['Op1','Op2']),
     Part('Part3',['Op1']),
     Part('Part4',['Op1','Op2','Op3','Op4','Op5']),
-    Part('Part5',['Op1','Op2','Op3'])
+    Part('Part5',['Op1','Op2','Op3']),
+    Part('Part6',['Op1','Op2'])
     ]
 
-#Machines that can do the work with operation time in minutes
-machines = [
+#Sample machines that can do the work with operation time in minutes
+machines_example = [
     Machine('Machine0', [
                         {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10},{'opname':'Op3','optime':10}]}
-                        ]),
+                        ],setuptime=200),
     
     Machine('Machine1', [
                         {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
@@ -31,10 +35,10 @@ machines = [
                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
                         #{'partname': 'Part4','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20},{'opname':'Op3','optime':10}]}
-                        ]),
+                        ],setuptime=100),
     
     Machine('Machine2', [
-                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20}]},
+                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20},{'opname':'Op3','optime':20}]},
                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20}]},
                         #{'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
@@ -60,12 +64,17 @@ machines = [
     ]
 
 #Work orders with Part and amount of parts to produce
-work_orders = [WorkOrder('Part4',100),WorkOrder('Part2',150),
+work_orders_example = [WorkOrder('Part4',100),WorkOrder('Part2',150),
                 WorkOrder('Part3',10),WorkOrder('Part3',20),
                 WorkOrder('Part1',100),WorkOrder('Part2',100),
                 WorkOrder('Part1',200),WorkOrder('Part5',50),
                 WorkOrder('Part4',10),WorkOrder('Part3',10),
                 WorkOrder('Part5',150),WorkOrder('Part2',250)]
+                
+#Load input data from CSV
+machines = Machine.machinesFromCSV("example input data\input_machines.csv")
+parts = Part.partsFromCSV("example input data\input_parts.csv")
+work_orders = WorkOrder.workOrdersFromCSV("example input data\input_workorders.csv")
 
 prod_manager = ProductionManager(parts,machines)
 
@@ -136,7 +145,7 @@ def scheduleFromSolution(solution):
 
                             #Setup time needed?
                             if last_op['part_name'] != current_work_point[1]['part_name'] or last_op['operation'] != current_work_point[1]['operation']:
-                                setup_operation = {'order_id':'setup','part_name':'setup','operation':'setup','starttime':last_op['endtime'],'endtime':last_op['endtime']+selected_machine_for_op.setup_time}
+                                setup_operation = {'order_id':'setup','order_size':'setup','part_name':'setup','operation':'setup','dependencies':'','scheduled':True,'starttime':last_op['endtime'],'endtime':last_op['endtime']+selected_machine_for_op.setup_time}
                                 machine_schedule[selected_machine_for_op.name].append(setup_operation)
                                 last_op = setup_operation
 
@@ -154,6 +163,31 @@ def scheduleFromSolution(solution):
                         current_work_point[1]['scheduled'] = True
         
     return (makespan,machine_schedule)
+
+def exportScheduleAsCSV(schedule,path="schedule_export.csv"):
+
+    with open(path,'w', newline='') as csvFile:
+        
+        csvWriter = csv.writer(csvFile,delimiter=';')
+        header = None
+        for machine in schedule.keys():
+
+            sched_items = schedule[machine]
+
+            for item in sched_items:
+                
+                machine_dict = {"machine_name":machine}
+
+                machine_dict.update(item)
+
+                if not header:
+                    header = machine_dict.keys()
+                    csvWriter.writerow(header)
+
+                csvWriter.writerow(machine_dict.values())    
+
+            
+
 
 def create_initial_population(size):
     print('Creating initial population of size %d...' % size)
@@ -179,7 +213,12 @@ def create_initial_population(size):
             possible_machines = prod_manager.getPossibleMachinesForWorkOp(op['part_name'], op['operation'])
             
             #print('Possible machines for part: '+op['part_name'] +' op: ' +op['operation'] +' -- ',possible_machines)
-            
+
+            #There are no machines available for this operation, cannot continue
+            if not possible_machines:
+               
+                sys.exit("No machines available for Part: " +op['part_name'] +' Operation: ' +op['operation'])
+
             gene = random.choice(possible_machines)
             
             chromo_part1.append(gene)
@@ -201,7 +240,7 @@ def create_initial_population(size):
 def fitness_function(solution, index):
     
     makespan = scheduleFromSolution(solution)[0]/10000
-    #return -makespan
+    
     return 1.0/makespan
 
 
@@ -296,35 +335,38 @@ def mutation_func(offspring, ga_instance):
 
 def on_generation(ga_instance):
     solution,best_fitness,best_index = ga_instance.best_solution()
-    global previous_best_solution,crossover_swap_thresh,crossover_part
+    global previous_best_solution,crossover_swap_thresh,crossover_part,lead_time
 
     if best_fitness > previous_best_solution[0]:
         previous_best_solution = best_fitness,ga_instance.generations_completed
-        makespan,schedule = scheduleFromSolution(solution=solution) 
+        makespan,schedule = scheduleFromSolution(solution=solution)
+        lead_time = makespan/60.0
         sp.plotUpdatedSchedule(makespan=makespan,schedule=schedule)
     gens_since_best = ga_instance.generations_completed - previous_best_solution[1]
 
     if gens_since_best != 0 and gens_since_best % crossover_swap_thresh == 0:
         crossover_part = int(not crossover_part)
-    print("| Generation: %d | Best fitness: %0.4f | Generations since best: %d |" % (ga_instance.generations_completed, best_fitness, gens_since_best), end='\r')
+    print("| Generation: %d | Best fitness: %0.4f | Lead time: %0.2f | Generations since best: %d |" % (ga_instance.generations_completed, previous_best_solution[0], lead_time, gens_since_best), end='\r')
 
     
 #Used to know when to swap the part that is crossed over
 #If no change after 'crossover_swap_thres' then move to next part to crossover(Machine vs Schedule)
 previous_best_solution = (-1,0)
-crossover_swap_thresh = 150
+crossover_swap_thresh = 250
 crossover_part = 0
+lead_time = float('inf')
 
-population_size = 100
+population_size = 40
 num_generations = 10000
 num_parents_mating = 20
 gene_type = (int)
 num_genes = len(prod_manager.work_plan)*2
 parent_selection_type = 'sss'
 keep_parents = 5
-mutation_percent_genes = 20
-stop_criterias = ['saturate_500']
+mutation_percent_genes = 10
+stop_criterias = ['saturate_800']
 population = create_initial_population(population_size)
+
 
 sp.showPlot()
 
@@ -348,5 +390,6 @@ ga_instance.plot_fitness(title='Fitness vs Generation')
 
 sp.keepPlot()
 makespan,machine_schedule = scheduleFromSolution(ga_instance.best_solution()[0])
+exportScheduleAsCSV(machine_schedule)
 
 #sp.plotSchedule(makespan,machine_schedule)
