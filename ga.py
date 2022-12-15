@@ -1,11 +1,13 @@
 #from turtle import delay
 import sys
+import os
 import csv
 import pygad as ga
 from production import Part,Machine,WorkOrder, ProductionManager
 import random
 import numpy as np
 import SchedulePlot as sp
+import argparse
 
 #### EXAMPLE DATA FOR THE DATASTRUCTURE OF parts,machines&orders ###########
 
@@ -70,7 +72,17 @@ work_orders_example = [WorkOrder('Part4',100),WorkOrder('Part2',150),
                 WorkOrder('Part1',200),WorkOrder('Part5',50),
                 WorkOrder('Part4',10),WorkOrder('Part3',10),
                 WorkOrder('Part5',150),WorkOrder('Part2',250)]
-                
+
+
+parser = argparse.ArgumentParser(description="Genetic Algorithm for Order planning")
+
+parser.add_argument('--no_plot',action="store_true")
+parser.add_argument('--no_csv_export',action="store_true")
+parser.add_argument('--runs',type=int,default=1)
+
+args = parser.parse_args()
+
+
 #Load input data from CSV
 machines = Machine.machinesFromCSV("example input data\input_machines.csv")
 parts = Part.partsFromCSV("example input data\input_parts.csv")
@@ -341,55 +353,68 @@ def on_generation(ga_instance):
         previous_best_solution = best_fitness,ga_instance.generations_completed
         makespan,schedule = scheduleFromSolution(solution=solution)
         lead_time = makespan/60.0
-        sp.plotUpdatedSchedule(makespan=makespan,schedule=schedule)
+
+        if not args.no_plot:
+            sp.plotUpdatedSchedule(makespan=makespan,schedule=schedule)
+
     gens_since_best = ga_instance.generations_completed - previous_best_solution[1]
 
     if gens_since_best != 0 and gens_since_best % crossover_swap_thresh == 0:
         crossover_part = int(not crossover_part)
     print("| Generation: %d | Best fitness: %0.4f | Lead time: %0.2f | Generations since best: %d |" % (ga_instance.generations_completed, previous_best_solution[0], lead_time, gens_since_best), end='\r')
 
-    
-#Used to know when to swap the part that is crossed over
-#If no change after 'crossover_swap_thres' then move to next part to crossover(Machine vs Schedule)
-previous_best_solution = (-1,0)
-crossover_swap_thresh = 250
-crossover_part = 0
-lead_time = float('inf')
+for run in range(args.runs):    
+    #Used to know when to swap the part that is crossed over
+    #If no change after 'crossover_swap_thres' then move to next part to crossover(Machine vs Schedule)
+    previous_best_solution = (-1,0)
+    crossover_swap_thresh = 150
+    crossover_part = 0
+    lead_time = float('inf')
 
-population_size = 40
-num_generations = 10000
-num_parents_mating = 20
-gene_type = (int)
-num_genes = len(prod_manager.work_plan)*2
-parent_selection_type = 'sss'
-keep_parents = 5
-mutation_percent_genes = 10
-stop_criterias = ['saturate_800']
-population = create_initial_population(population_size)
+    population_size = 50
+    num_generations = 10000
+    num_parents_mating = 20
+    gene_type = (int)
+    num_genes = len(prod_manager.work_plan)*2
+    parent_selection_type = 'sss'
+    keep_parents = 5
+    mutation_percent_genes = 20
+    stop_criterias = ['saturate_500']
+    population = create_initial_population(population_size)
 
 
-sp.showPlot()
 
-ga_instance = ga.GA(num_generations=num_generations,
-                       num_parents_mating=num_parents_mating,
-                       fitness_func=fitness_function,
-                       gene_type=gene_type,
-                       num_genes=num_genes,
-                       initial_population=population,
-                       parent_selection_type=parent_selection_type,
-                       keep_parents=keep_parents,
-                       crossover_type=crossover_func,
-                       mutation_type=mutation_func,
-                       mutation_percent_genes=mutation_percent_genes,
-                       on_generation=on_generation,
-                       stop_criteria=stop_criterias)
 
-ga_instance.run()
+    if not args.no_plot:
+        sp.showPlot()
 
-ga_instance.plot_fitness(title='Fitness vs Generation')
+    ga_instance = ga.GA(num_generations=num_generations,
+                        num_parents_mating=num_parents_mating,
+                        fitness_func=fitness_function,
+                        gene_type=gene_type,
+                        num_genes=num_genes,
+                        initial_population=population,
+                        parent_selection_type=parent_selection_type,
+                        keep_parents=keep_parents,
+                        crossover_type=crossover_func,
+                        mutation_type=mutation_func,
+                        mutation_percent_genes=mutation_percent_genes,
+                        on_generation=on_generation,
+                        stop_criteria=stop_criterias,
+                        parallel_processing=["thread",os.cpu_count()])
 
-sp.keepPlot()
-makespan,machine_schedule = scheduleFromSolution(ga_instance.best_solution()[0])
-exportScheduleAsCSV(machine_schedule)
+
+    ga_instance.run()
+
+    if not args.no_plot:
+        ga_instance.plot_fitness(title='Fitness vs Generation')
+
+        sp.keepPlot()
+
+    makespan,machine_schedule = scheduleFromSolution(ga_instance.best_solution()[0])
+
+    if not args.no_csv_export:
+        file_path = "exports\schedule_export_" + str(run) + ".csv"
+        exportScheduleAsCSV(machine_schedule,path=file_path)
 
 #sp.plotSchedule(makespan,machine_schedule)
