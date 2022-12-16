@@ -8,6 +8,7 @@ import random
 import numpy as np
 import SchedulePlot as sp
 import argparse
+from importlib import reload
 
 #### EXAMPLE DATA FOR THE DATASTRUCTURE OF parts,machines&orders ###########
 
@@ -363,6 +364,7 @@ def on_generation(ga_instance):
         crossover_part = int(not crossover_part)
     print("| Generation: %d | Best fitness: %0.4f | Lead time: %0.2f | Generations since best: %d |" % (ga_instance.generations_completed, previous_best_solution[0], lead_time, gens_since_best), end='\r')
 
+#Start the number of runs requested
 for run in range(args.runs):    
     #Used to know when to swap the part that is crossed over
     #If no change after 'crossover_swap_thres' then move to next part to crossover(Machine vs Schedule)
@@ -413,8 +415,12 @@ for run in range(args.runs):
 
     makespan,machine_schedule = scheduleFromSolution(ga_instance.best_solution()[0])
 
+    #CSV export requested
     if not args.no_csv_export:
-        file_path = "exports\schedule_export_" + str(run) + ".csv"
+
+        file_path = "exports\schedule_export_" + str(run) + "_" + str(makespan) + ".csv"
         exportScheduleAsCSV(machine_schedule,path=file_path)
 
-#sp.plotSchedule(makespan,machine_schedule)
+    #Reset the plot
+    if not run == args.runs:
+        reload(sp)
