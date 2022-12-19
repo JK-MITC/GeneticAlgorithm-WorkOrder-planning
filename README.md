@@ -4,9 +4,11 @@
 * Python 3.7.3
 * PyGAD 2.18.1
 
-## Input data examples (Do NOT include headers in file)
+## Input CSV data examples (Do NOT include headers in file)
+* Copy and edit the example CSV files from **/example input data/** to **/imports/**
 
 ### Part & operations (The parts that can be produced)
+* Filename **input_parts.csv**
 * First column **Part name**
 * Add as many **Operations** as needed in following columns
 
@@ -19,6 +21,7 @@
 |Part5   |Op1  |Op2|Op3|   |
 
 ### Machines/Assets (The assets that can produce Parts)
+* Filename **input_machines.csv**
 * **Part name & Operation name** must match a Part in the Parts input
 * **Time** is time required for the operation in the machine
 
@@ -35,6 +38,7 @@
 |Machine2|Part2|Op2|100|
 
 ### Work order list (The list of Parts that will be produced)
+* Filename **input_workorders.csv**
 * First column is the **Part name** to be produced
 * **Amount** of parts to be produced
 
