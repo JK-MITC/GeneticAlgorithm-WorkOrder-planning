@@ -361,7 +361,7 @@ def on_generation(ga_instance):
 
     if gens_since_best != 0 and gens_since_best % crossover_swap_thresh == 0:
         crossover_part = int(not crossover_part)
-    print("| Generation: %d | Best fitness: %0.4f | Lead time: %0.2f | Generations since best: %d |" % (ga_instance.generations_completed, previous_best_solution[0], lead_time, gens_since_best), end='\r')
+    print("| Generation: %d | Best fitness: %0.4f | Lead time: %0.2f h | Generations since best: %d |" % (ga_instance.generations_completed, previous_best_solution[0], lead_time, gens_since_best), end='\r')
 
 
 #Read the config json
@@ -389,8 +389,6 @@ for run in range(args.runs):
     mutation_percent_genes = jsonConfig['mutation_percent_of_genes']
     stop_criterias = ['saturate_'+str(jsonConfig['saturation'])]
     population = create_initial_population(population_size)
-
-
 
 
     if not args.no_plot:
