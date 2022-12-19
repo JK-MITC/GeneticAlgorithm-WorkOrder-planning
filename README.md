@@ -5,7 +5,7 @@
 * PyGAD 2.18.1
 
 ## Input CSV data examples (Do NOT include headers in file)
-* Copy and edit the example CSV files from **/example input data/** to **/imports/**
+* Copy and edit the example CSV files from **example input data\\** to **imports\\**
 
 ### Part & operations (The parts that can be produced)
 * Filename **input_parts.csv**
