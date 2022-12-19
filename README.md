@@ -55,7 +55,7 @@
 |Part5   |100  |
 
 ## Output schedule
-* A schedule result file is output in the format **exports\schedule_export_{run_id}\_{total_time}.csv**
+* A schedule result file is output in the format **exports\schedule_export_{run_id}\_{total_time_in_minutes}.csv**
 
 |Machine name|Order id|Order size|Part name|Operation|Dependencies         |Scheduled|Starttime|Endtime|
 |------------|--------|----------|---------|---------|---------------------|---------|---------|-------|
@@ -98,5 +98,7 @@ The file **ga_config.json** can be used to edit parameters of the Genetic Algori
 To start the application, run the command: ```python ga.py --{optional arguments}```
 #### Arguments
 * --no_plot       (Do not show the plot, default **false**)
-* --runs          (Number of runs, creates a separate schedule for every run, default **1**)
+* --runs {x}         (Number of runs(x), creates a separate schedule for every run, default **1**)
 * --no_csv_export (Do not export a CSV file, default **false**)
+
+Example: ```python ga.py --no_plot --runs 3``` will create 3 output schedules in the exports folder, without displaying the plot during the runs.
