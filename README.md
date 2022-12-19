@@ -75,6 +75,24 @@
 |Machine1    |7       |50        |Part1    |Op3      |['Op1', 'Op2']       |True     |13360    |14860  |
 |Machine1    |0       |200       |Part1    |Op3      |['Op1', 'Op2']       |True     |14860    |20860  |
 
+## GA configuration
+
+The file **ga_config.json** can be used to edit parameters of the Genetic Algorithm 
+```
+{
+    "ga_parameters" : {
+
+        "population_size" : 50,
+        "generations" : 10000,
+        "parents_mating" : 10,
+        "keep_parents" : 5,
+        "mutation_percent_of_genes" : 20,
+        "saturation" : 500
+    
+        }
+}
+```
+
 ## Run the application
 
 To start the application, run the command: ```python ga.py --{optional arguments}```
