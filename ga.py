@@ -12,67 +12,67 @@ from importlib import reload
 
 #### EXAMPLE DATA FOR THE DATASTRUCTURE OF parts,machines&orders ###########
 
-#Part with it's operations
-parts_example = [
-    Part('Part1',['Op1','Op2']),
-    Part('Part2',['Op1','Op2']),
-    Part('Part3',['Op1']),
-    Part('Part4',['Op1','Op2','Op3','Op4','Op5']),
-    Part('Part5',['Op1','Op2','Op3']),
-    Part('Part6',['Op1','Op2'])
-    ]
+# #Part with it's operations
+# parts_example = [
+#     Part('Part1',['Op1','Op2']),
+#     Part('Part2',['Op1','Op2']),
+#     Part('Part3',['Op1']),
+#     Part('Part4',['Op1','Op2','Op3','Op4','Op5']),
+#     Part('Part5',['Op1','Op2','Op3']),
+#     Part('Part6',['Op1','Op2'])
+#     ]
 
 #Sample machines that can do the work with operation time in minutes
-machines_example = [
-    Machine('Machine0', [
-                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
-                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
-                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
-                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
-                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10},{'opname':'Op3','optime':10}]}
-                        ],setuptime=200),
+# machines_example = [
+#     Machine('Machine0', [
+#                         {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
+#                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
+#                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+#                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+#                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10},{'opname':'Op3','optime':10}]}
+#                         ],setuptime=200),
     
-    Machine('Machine1', [
-                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
-                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
-                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
-                        #{'partname': 'Part4','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
-                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20},{'opname':'Op3','optime':10}]}
-                        ],setuptime=100),
+#     Machine('Machine1', [
+#                         {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10}]},
+#                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
+#                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+#                         #{'partname': 'Part4','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+#                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20},{'opname':'Op3','optime':10}]}
+#                         ],setuptime=100),
     
-    Machine('Machine2', [
-                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20},{'opname':'Op3','optime':20}]},
-                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20}]},
-                        #{'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
-                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
-                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20},{'opname':'Op3','optime':10}]}
-                        ]),
+#     Machine('Machine2', [
+#                         {'partname': 'Part1','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20},{'opname':'Op3','optime':20}]},
+#                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20}]},
+#                         #{'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+#                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+#                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':20},{'opname':'Op3','optime':10}]}
+#                         ]),
 
-    Machine('Machine3', [
-                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20}]},
-                        {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':30}]},
-                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':20}]},
-                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
-                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10},{'opname':'Op3','optime':10}]}
-                        ]),
+#     Machine('Machine3', [
+#                         {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20}]},
+#                         {'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':30}]},
+#                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':20}]},
+#                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+#                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':10},{'opname':'Op3','optime':10}]}
+#                         ]),
 
-    Machine('Machine4', [
-                        {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20}]},
-                        #{'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
-                        {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
-                        {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
-                        {'partname': 'Part5','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':15},{'opname':'Op3','optime':15}]}
-                        ]),
+#     Machine('Machine4', [
+#                         {'partname': 'Part1','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':20}]},
+#                         #{'partname': 'Part2','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':10}]},
+#                         {'partname': 'Part3','operations':[{'opname':'Op1','optime':10}]},
+#                         {'partname': 'Part4','operations':[{'opname':'Op1','optime':10},{'opname':'Op2','optime':15},{'opname':'Op3','optime':20},{'opname':'Op4','optime':15},{'opname':'Op5','optime':15}]},
+#                         {'partname': 'Part5','operations':[{'opname':'Op1','optime':20},{'opname':'Op2','optime':15},{'opname':'Op3','optime':15}]}
+#                         ]),
                          
-    ]
+#     ]
 
-#Work orders with Part and amount of parts to produce
-work_orders_example = [WorkOrder('Part4',100),WorkOrder('Part2',150),
-                WorkOrder('Part3',10),WorkOrder('Part3',20),
-                WorkOrder('Part1',100),WorkOrder('Part2',100),
-                WorkOrder('Part1',200),WorkOrder('Part5',50),
-                WorkOrder('Part4',10),WorkOrder('Part3',10),
-                WorkOrder('Part5',150),WorkOrder('Part2',250)]
+# #Work orders with Part and amount of parts to produce
+# work_orders_example = [WorkOrder('Part4',100),WorkOrder('Part2',150),
+#                 WorkOrder('Part3',10),WorkOrder('Part3',20),
+#                 WorkOrder('Part1',100),WorkOrder('Part2',100),
+#                 WorkOrder('Part1',200),WorkOrder('Part5',50),
+#                 WorkOrder('Part4',10),WorkOrder('Part3',10),
+#                 WorkOrder('Part5',150),WorkOrder('Part2',250)]
 
 
 parser = argparse.ArgumentParser(description="Genetic Algorithm for Order planning")
@@ -85,9 +85,9 @@ args = parser.parse_args()
 
 
 #Load input data from CSV
-machines = Machine.machinesFromCSV("example input data\input_machines.csv")
-parts = Part.partsFromCSV("example input data\input_parts.csv")
-work_orders = WorkOrder.workOrdersFromCSV("example input data\input_workorders.csv")
+machines = Machine.machinesFromCSV("imports\input_machines.csv")
+parts = Part.partsFromCSV("imports\input_parts.csv")
+work_orders = WorkOrder.workOrdersFromCSV("imports\input_workorders.csv")
 
 prod_manager = ProductionManager(parts,machines)
 
@@ -275,8 +275,6 @@ def crossover_func(parents, offspring_size, ga_instance):
 
         #Cross the Machine selection part (First half of chromosome)
         if crossover_part == 0:
-            #random_split_point = np.random.choice(range(gene_length))         
-            #parent1[random_split_point:gene_length] = parent2[random_split_point:gene_length]
 
             #pick amount of indices to cross
             selected_amount = gene_length*0.3
