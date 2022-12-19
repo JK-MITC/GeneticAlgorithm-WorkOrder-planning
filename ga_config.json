@@ -1,0 +1,12 @@
+{
+    "ga_parameters" : {
+
+        "population_size" : 50,
+        "generations" : 10000,
+        "parents_mating" : 10,
+        "keep_parents" : 5,
+        "mutation_percent_of_genes" : 20,
+        "saturation" : 500
+    
+        }
+}

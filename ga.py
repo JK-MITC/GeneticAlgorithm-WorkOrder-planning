@@ -9,6 +9,7 @@ import numpy as np
 import SchedulePlot as sp
 import argparse
 from importlib import reload
+import json
 
 #### EXAMPLE DATA FOR THE DATASTRUCTURE OF parts,machines&orders ###########
 
@@ -362,6 +363,13 @@ def on_generation(ga_instance):
         crossover_part = int(not crossover_part)
     print("| Generation: %d | Best fitness: %0.4f | Lead time: %0.2f | Generations since best: %d |" % (ga_instance.generations_completed, previous_best_solution[0], lead_time, gens_since_best), end='\r')
 
+
+#Read the config json
+with open(file='ga_config.json') as config_file:
+
+    jsonConfig = json.load(config_file)['ga_parameters']
+
+
 #Start the number of runs requested
 for run in range(args.runs):    
     #Used to know when to swap the part that is crossed over
@@ -371,15 +379,15 @@ for run in range(args.runs):
     crossover_part = 0
     lead_time = float('inf')
 
-    population_size = 50
-    num_generations = 10000
-    num_parents_mating = 20
+    population_size = jsonConfig['population_size']
+    num_generations = jsonConfig['generations']
+    num_parents_mating = jsonConfig['parents_mating']
     gene_type = (int)
     num_genes = len(prod_manager.work_plan)*2
     parent_selection_type = 'sss'
-    keep_parents = 5
-    mutation_percent_genes = 20
-    stop_criterias = ['saturate_500']
+    keep_parents = jsonConfig['keep_parents']
+    mutation_percent_genes = jsonConfig['mutation_percent_of_genes']
+    stop_criterias = ['saturate_'+str(jsonConfig['saturation'])]
     population = create_initial_population(population_size)
 
 
@@ -422,3 +430,5 @@ for run in range(args.runs):
     #Reset the plot
     if not run == args.runs:
         reload(sp)
+
+    print('\n')
