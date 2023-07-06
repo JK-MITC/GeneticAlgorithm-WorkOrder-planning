@@ -28,7 +28,7 @@ with open('ga_config.json') as f:
     ga_config = json.load(f)
     ga_parameters = ga_config['ga_parameters']
 
-# Define the GUI layout
+# Defines the GUI layout
 page1_layout = [
     [sg.Text('Select a CSV file for machines:')],
     [sg.Input(key='machines'), sg.FileBrowse()],
@@ -49,7 +49,7 @@ page1_layout = [
     [sg.Button('Next')]
 ]
 
-# Create the GUI window
+# Creates the GUI window
 window = sg.Window('ORDER-PLANER', page1_layout)
 
 # Event loop to process events and get input from the user
@@ -58,7 +58,7 @@ while True:
     if event == sg.WIN_CLOSED:
         break
     elif event == 'Next':
-        # Update GA parameters in config file
+        # Updates GA parameters in config file
         ga_parameters['population_size'] = int(values['population_size'])
         ga_parameters['generations'] = int(values['generations'])
         ga_parameters['parents_mating'] = int(values['parents_mating'])
