@@ -1,1 +1,10 @@
-{"ga_parameters": {"population_size": 50, "generations": 300, "parents_mating": 10, "keep_parents": 5, "mutation_percent_of_genes": 20, "saturation": 500}}
+{
+    "ga_parameters": {
+        "population_size": 50,
+        "generations": 1500,
+        "parents_mating": 10,
+        "keep_parents": 5,
+        "mutation_percent_of_genes": 20,
+        "saturation": 500
+    }
+}

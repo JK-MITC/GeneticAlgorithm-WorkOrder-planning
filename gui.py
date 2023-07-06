@@ -65,9 +65,11 @@ while True:
         ga_parameters['keep_parents'] = int(values['keep_parents'])
         ga_parameters['mutation_percent_of_genes'] = int(values['mutation_percent_of_genes'])
         ga_parameters['saturation'] = int(values['saturation'])
-        
+                
+        # Saves updated GA parameters to config file
         with open('ga_config.json', 'w') as f:
-            json.dump(ga_config, f)
+            json.dump({'ga_parameters': ga_parameters}, f, indent=4)
+
         parser = argparse.ArgumentParser(description="Genetic Algorithm for Order planning")
 
         parser.add_argument('--no_plot',action="store_true")
