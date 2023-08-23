@@ -252,7 +252,7 @@ while True:
             
             makespan = scheduleFromSolution(solution)[0]/10000
             
-            return 1.0/makespan
+            return makespan
 
 
 
