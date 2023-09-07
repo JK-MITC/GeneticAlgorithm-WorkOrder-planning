@@ -249,11 +249,26 @@ while True:
             return np.array(population)
             
         def fitness_function(solution, index):
+            makespan, machine_schedule = scheduleFromSolution(solution)
+            total_idle_time = calculate_total_idle_time(machine_schedule)   
+            penalty_factor = 0.8  # Adjust the penalty factor (paverkar friheten)
             
-            makespan = scheduleFromSolution(solution)[0]/10000
+            fitness_score = 1.0 / makespan - penalty_factor * total_idle_time
+            return fitness_score
+        
+        def calculate_total_idle_time(machine_schedule):
+            total_idle_time = 0
             
-            return 1.0/makespan
-
+            for machine_name, ops in machine_schedule.items():
+                for i in range(1, len(ops)):
+                    current_op = ops[i]
+                    previous_op = ops[i-1]
+                    
+                    if current_op['order_id'] == previous_op['order_id']:
+                        idle_time = current_op['starttime'] - previous_op['endtime']
+                        total_idle_time += max(0, idle_time)
+            
+            return total_idle_time
 
 
         def crossover_func(parents, offspring_size, ga_instance):
