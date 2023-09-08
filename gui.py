@@ -442,6 +442,12 @@ while True:
 
             print('\n') 
 
+            if event == sg.WINDOW_CLOSED:
+                    break  # Exit the while loop when the window is closed
+
+            # Clean up any necessary resources or perform final operations
+            sys.exit(0)  # Terminate the program gracefully
+
 
 
 # Close the GUI window
