@@ -251,12 +251,12 @@ while True:
         def fitness_function(solution, index):
             makespan, machine_schedule = scheduleFromSolution(solution)
             total_idle_time = calculate_total_idle_time(machine_schedule)   
-            penalty_factor = 0.8  # Adjust the penalty factor (paverkar friheten)
+            penalty_factor = 0.8  # Adjust the penalty factor (paverkar friheten) //Mehdi
             
             fitness_score = 1.0 / makespan - penalty_factor * total_idle_time
             return fitness_score
         
-        def calculate_total_idle_time(machine_schedule):
+        def calculate_total_idle_time(machine_schedule): #calculates idle time of order to use in fitness_func //Mehdi
             total_idle_time = 0
             
             for machine_name, ops in machine_schedule.items():
@@ -269,7 +269,6 @@ while True:
                         total_idle_time += max(0, idle_time)
             
             return total_idle_time
-
 
         def crossover_func(parents, offspring_size, ga_instance):
 
