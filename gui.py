@@ -259,13 +259,13 @@ while True:
         def calculate_total_idle_time(machine_schedule): #calculates idle time of order to use in fitness_func //Mehdi
             total_idle_time = 0
             
-            for machine_name, ops in machine_schedule.items():
+            for machine_name, ops in machine_schedule.items(): #itererar genom schedule items 
                 for i in range(1, len(ops)):
                     current_op = ops[i]
                     previous_op = ops[i-1]
                     
-                    if current_op['order_id'] == previous_op['order_id']:
-                        idle_time = current_op['starttime'] - previous_op['endtime']
+                    if current_op['order_id'] == previous_op['order_id']:  #om båda op tillhör samma order
+                        idle_time = current_op['starttime'] - previous_op['endtime'] #beräknar idle time för ordern
                         total_idle_time += max(0, idle_time)
             
             return total_idle_time
@@ -443,10 +443,9 @@ while True:
             print('\n') 
 
             if event == sg.WINDOW_CLOSED:
-                    break  # Exit the while loop when the window is closed
-
-            # Clean up any necessary resources or perform final operations
-            sys.exit(0)  # Terminate the program gracefully
+                    break  # Exit the while loop if gui is closed
+            
+            sys.exit(0)  # Terminates the program correctly
 
 
 
