@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Genetic Algorithm Scheduler</h1>
+
+    <form action="{{ url_for('submit') }}" method="post">
+        <br>
+        <label for="machines">Select a CSV file for machines:</label>
+        <input type="file" name="machines" accept=".csv" required>
+        <br>
+        <label for="parts">Select a CSV file for parts:</label>
+        <input type="file" name="parts" accept=".csv" required>
+        <br>
+        <label for="workorders">Select a CSV file for work orders:</label>
+        <input type="file" name="workorders" accept=".csv" required>
+        <br>
+        <label for="population_size">Population Size:</label>
+        <input type="number" name="population_size" required>
+        <br>
+        <label for="generations">Generations:</label>
+        <input type="number" name="generations" required>
+        <br>
+        <label for="parents_mating">Parents Mating:</label>
+        <input type="number" name="parents_mating" required>
+        <br>
+        <label for="keep_parents">Keep Parents:</label>
+        <input type="number" name="keep_parents" required>
+        <br>
+        <label for="mutation_percent_of_genes">Mutation % of Genes:</label>
+        <input type="number" name="mutation_percent_of_genes" required>
+        <br>
+        <label for="saturation">Saturation:</label>
+        <input type="number" name="saturation" required>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- You can display results or other content here -->
+</body>
+</html>
